@@ -2,9 +2,9 @@ import os
 from dotenv import load_dotenv
 import replicate
 from GPT_api_client import call_chat_api
+import streamlit as st
 
-load_dotenv()
-api_key = os.getenv("REPLICATE_API_KEY")
+api_key = st.secrets["REPLICATE_API_KEY"]
 if api_key is None:
     raise ValueError("請先設定環境變數 REPLICATE_API_KEY")
 os.environ["REPLICATE_API_TOKEN"] = api_key
