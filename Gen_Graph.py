@@ -1,35 +1,46 @@
-from GPT_api_client import call_chat_api
+import os
+import replicate
+import requests
+from dotenv import load_dotenv
 
-def generate_stamp(diary_text: str, mode: str = "simple") -> str:
+# 載入 .env（若存在）
+load_dotenv()
+
+# 確保 REPLICATE_API_KEY 有設定
+api_key = os.getenv("REPLICATE_API_KEY")
+if not api_key:
+    raise ValueError("請先在 .env 或 secrets.toml 中設定 REPLICATE_API_KEY")
+
+# 設定 replicate token
+os.environ["REPLICATE_API_TOKEN"] = api_key
+
+def generate_image_from_diary(diary_text: str, output_path: str = "output.png") -> str:
     """
-    根據日記內容，回傳代表這一天的 emoji 或數字。
-
-    優先順序：
-    1. 出門就醫：🏥、🚗、🚌 等
-    2. 活動參與：🎤、🎂、🙏 等
-    3. 情緒強烈：😆、😭、😡 等
-    4. 其他情況：直接回傳日期數字（例如 '16'）
-
-    回傳格式：
-    - 僅回傳一個 emoji 或數字，不含說明或標點。
+    根據日記內容，呼叫 Replicate API 生成圖片，儲存至本地，回傳檔案路徑。
     """
+    prompt = (
+        f"An elderly man in a nursing home, {diary_text}, "
+        "anime style, soft lighting, Studio Ghibli vibe, "
+        "high detail, heartwarming atmosphere"
+    )
 
-    system_prompt = {
-        "role": "system",
-        "content": (
-            "你是一個貼圖產生小幫手，根據每篇日記內容，挑選一個最適合代表這一天的貼圖。\n"
-            "請依照以下優先順序選擇：\n"
-            "1. 如果有去醫院、診所或任何外出，請挑選該地點代表性的貼圖（如🏥、🚗、🚌等）。\n"
-            "2. 如果有活動，請挑選該活動代表性的貼圖（如🎂、🎤、🙏等）。\n"
-            "3. 如果情緒有非常激烈的起伏，請挑選該情緒表情符號（如😆、😭、😡等）。\n"
-            "4. 其他情況，請回傳該日的日期數字（如『16』）。\n\n"
-            "請**只回覆一個 emoji 或數字，不要加任何說明文字、標點或其他語句**。"
+    try:
+        output = replicate.run(
+            "black-forest-labs/flux-schnell",
+            input={"prompt": prompt}
         )
-    }
 
-    messages = [
-        system_prompt,
-        {"role": "user", "content": diary_text.strip()}
-    ]
+        # 通常 output[0] 是圖片 URL，下載它
+        image_url = output[0]
+        response = requests.get(image_url)
 
-    return call_chat_api(messages=messages, mode=mode).strip()
+        if response.status_code == 200:
+            with open(output_path, "wb") as f:
+                f.write(response.content)
+            return output_path
+        else:
+            raise RuntimeError(f"圖片下載失敗，狀態碼：{response.status_code}")
+
+    except Exception as e:
+        print(f"[generate_image_from_diary] 發生錯誤：{e}")
+        return None
