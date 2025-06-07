@@ -1,9 +1,6 @@
 import os
 import requests
 from dotenv import load_dotenv
-from rich import print
-from rich.pretty import Pretty
-from rich.panel import Panel
 
 # 載入 .env 檔案中的環境變數
 load_dotenv()
@@ -19,7 +16,7 @@ def call_chat_api(messages, max_tokens=None, mode="simple"):
     參數：
     - messages: list，ChatGPT 訊息格式
     - max_tokens: int，控制輸出長度（預設不限）
-    - mode: str，'simple' 僅回傳文字，'debug' 顯示詳細資訊
+    - mode: str，'simple' 僅回傳文字，'debug' 顯示簡單 debug 資訊
 
     回傳：
     - str：GPT 回應文字（若失敗則為 None）
@@ -33,7 +30,6 @@ def call_chat_api(messages, max_tokens=None, mode="simple"):
 
     data = {
         "model": "gpt-4o-mini",
-        "store": False,
         "temperature": 1.0,
         "messages": messages
     }
@@ -42,31 +38,22 @@ def call_chat_api(messages, max_tokens=None, mode="simple"):
         data["max_tokens"] = max_tokens
 
     if mode == "debug":
-        print(Panel.fit(Pretty({
-            "url": url,
-            "headers": headers,
-            "data": data
-        }), title="📤 Request Info"))
+        print("📤 發送請求內容：")
+        print(data)
 
-    response = requests.post(url, headers=headers, json=data)
-
-    if response.status_code == 200:
+    try:
+        response = requests.post(url, headers=headers, json=data)
+        response.raise_for_status()
         res_json = response.json()
 
         if mode == "debug":
-            print(Panel.fit(Pretty(res_json), title="📥 Response JSON"))
+            print("📥 回應 JSON：")
+            print(res_json)
 
-        try:
-            content = res_json["choices"][0]["message"]["content"]
-            if mode == "debug":
-                print(Panel.fit("文字回應：\n\n" + content.strip(), title="✨ AI 回應內容"))
-            return content.strip()
-        except Exception as e:
-            print(f"[red]⚠️ 回應解析失敗：[bold]{e}[/bold][/red]")
-            return None
+        return res_json["choices"][0]["message"]["content"].strip()
 
-    else:
-        print(Panel.fit(f"{response.status_code}\n{response.text}", title="❌ 請求失敗"))
+    except Exception as e:
+        print(f"❌ 錯誤：{e}")
         return None
 
 
@@ -75,6 +62,6 @@ if __name__ == "__main__":
     response = call_chat_api(
         messages=[{"role": "user", "content": "Morning~"}],
         max_tokens=50,
-        mode="debug"  # 或 "simple"
+        mode="debug"
     )
-    print(f"[bold green]簡化回傳（給外部用）:[/bold green] {response}")
+    print(f"簡化回傳：{response}")
