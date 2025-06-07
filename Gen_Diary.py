@@ -113,7 +113,7 @@ def generate_diary(user_input: str, mode: str = "debug") -> str:
         {
             "role": "user",
             "content": (
-                "今天下雨，阿水伯血壓198/70，有去參加音樂課，下午心情好像不錯。"
+                {user_input}
          )
         }
     ]
