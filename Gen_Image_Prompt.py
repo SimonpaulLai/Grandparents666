@@ -1,19 +1,10 @@
 from GPT_api_client import call_chat_api
 
-def generate_image_prompt(user_input: str, diary_text: str, mode: str = "fast") -> str:
+def generate_image_prompt(user_input: str, diary_text: str, mode="fast") -> str:
     """
-    根據使用者描述與日記內容，生成代表性的英文圖片描述。
-
-    規則：
-    - 聚焦於 user_input，避免虛構內容
-    - 圖像畫面應簡單、有代表性
-    - 使用 general 描述（如 an elderly man），不要出現真名
-    - 僅輸出英文圖片 prompt，不加說明文字
-
-    回傳範例：
-    - "An elderly man walking with a cane in the rain, soft blurry hospital in background"
+    根據 user_input 與 diary_text，請 GPT 寫出一個代表性、簡化畫面的英文 prompt。
+    用來生成圖片。
     """
-
     system_prompt = {
         "role": "system",
         "content": (
@@ -35,10 +26,7 @@ def generate_image_prompt(user_input: str, diary_text: str, mode: str = "fast") 
 
     messages = [
         system_prompt,
-        {
-            "role": "user",
-            "content": f"原始描述（user_input）:\n{user_input.strip()}\n\n日記內容:\n{diary_text.strip()}"
-        }
+        {"role": "user", "content": f"原始描述（user_input）:\n{user_input}\n\n日記內容:\n{diary_text}"}
     ]
 
     return call_chat_api(messages=messages, max_tokens=150, mode=mode).strip()
