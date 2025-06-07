@@ -8,6 +8,7 @@ load_dotenv()
 
 # 優先使用 st.secrets，其次用 os.environ（方便本地與雲端都能跑）
 api_key = st.secrets.get("OPENAI_API_KEY") or os.getenv("OPENAI_API_KEY")
+print(api_key)
 if api_key is None:
     raise ValueError("❌ 請先設定環境變數 OPENAI_API_KEY")
 
@@ -32,7 +33,7 @@ def call_chat_api(messages, max_tokens=None, mode="simple"):
     }
 
     data = {
-        "model": "gpt-4o",  # 若你用的是 Plus 可改 gpt-4o，免費方案請用 gpt-3.5-turbo
+        "model": "gpt-3.5-turbo",  # 若你用的是 Plus 可改 gpt-4o，免費方案請用 gpt-3.5-turbo
         "temperature": 1.0,
         "messages": messages
     }
