@@ -1,16 +1,15 @@
 import os
 import requests
-import streamlit as st
 from dotenv import load_dotenv
+from rich import print
+from rich.pretty import Pretty
+from rich.panel import Panel
 
-# 載入 .env（本地測試用），雲端部署時會自動用 st.secrets
+# 載入 .env 檔案中的環境變數
 load_dotenv()
-
-# 優先使用 st.secrets，其次用 os.environ（方便本地與雲端都能跑）
-api_key = st.secrets.get("OPENAI_API_KEY") or os.getenv("OPENAI_API_KEY")
-print(api_key)
+api_key = os.getenv("OPENAI_API_KEY")
 if api_key is None:
-    raise ValueError("❌ 請先設定環境變數 OPENAI_API_KEY")
+    raise ValueError("請先設定環境變數 OPENAI_API_KEY")
 
 
 def call_chat_api(messages, max_tokens=None, mode="simple"):
@@ -33,7 +32,8 @@ def call_chat_api(messages, max_tokens=None, mode="simple"):
     }
 
     data = {
-        "model": "gpt-3.5-turbo",  # 若你用的是 Plus 可改 gpt-4o，免費方案請用 gpt-3.5-turbo
+        "model": "gpt-4o-mini",
+        "store": False,
         "temperature": 1.0,
         "messages": messages
     }
@@ -42,12 +42,11 @@ def call_chat_api(messages, max_tokens=None, mode="simple"):
         data["max_tokens"] = max_tokens
 
     if mode == "debug":
-        st.subheader("📤 Request Info")
-        st.json({
+        print(Panel.fit(Pretty({
             "url": url,
-            "headers": {k: ("***" if k == "Authorization" else v) for k, v in headers.items()},
+            "headers": headers,
             "data": data
-        })
+        }), title="📤 Request Info"))
 
     response = requests.post(url, headers=headers, json=data)
 
@@ -55,29 +54,27 @@ def call_chat_api(messages, max_tokens=None, mode="simple"):
         res_json = response.json()
 
         if mode == "debug":
-            st.subheader("📥 Response JSON")
-            st.json(res_json)
+            print(Panel.fit(Pretty(res_json), title="📥 Response JSON"))
 
         try:
             content = res_json["choices"][0]["message"]["content"]
             if mode == "debug":
-                st.success("✨ AI 回應內容")
-                st.markdown(content.strip())
+                print(Panel.fit("文字回應：\n\n" + content.strip(), title="✨ AI 回應內容"))
             return content.strip()
         except Exception as e:
-            st.error(f"⚠️ 回應解析失敗：{e}")
+            print(f"[red]⚠️ 回應解析失敗：[bold]{e}[/bold][/red]")
             return None
 
     else:
-        st.error(f"❌ 請求失敗：{response.status_code}")
-        st.text(response.text)
+        print(Panel.fit(f"{response.status_code}\n{response.text}", title="❌ 請求失敗"))
         return None
 
 
-# ⚙️ 測試用（僅限本地 CLI 環境，不適用 Streamlit）
+# 測試用（單獨執行時）
 if __name__ == "__main__":
-    res = call_chat_api(
-        messages=[{"role": "user", "content": "Hello from Streamlit version"}],
-        mode="debug"
+    response = call_chat_api(
+        messages=[{"role": "user", "content": "Morning~"}],
+        max_tokens=50,
+        mode="debug"  # 或 "simple"
     )
-    print("簡化回傳:", res)
+    print(f"[bold green]簡化回傳（給外部用）:[/bold green] {response}")
