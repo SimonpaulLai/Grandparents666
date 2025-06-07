@@ -1,19 +1,10 @@
 from GPT_api_client import call_chat_api
 
+
 def generate_stamp(diary_text: str, mode: str = "simple") -> str:
     """
-    根據日記內容，回傳代表這一天的 emoji 或數字。
-
-    優先順序：
-    1. 出門就醫：🏥、🚗、🚌 等
-    2. 活動參與：🎤、🎂、🙏 等
-    3. 情緒強烈：😆、😭、😡 等
-    4. 其他情況：直接回傳日期數字（例如 '16'）
-
-    回傳格式：
-    - 僅回傳一個 emoji 或數字，不含說明或標點。
+    根據日記內容，請 GPT 回傳一個 emoji 或數字，代表這一天。
     """
-
     system_prompt = {
         "role": "system",
         "content": (
@@ -29,7 +20,7 @@ def generate_stamp(diary_text: str, mode: str = "simple") -> str:
 
     messages = [
         system_prompt,
-        {"role": "user", "content": diary_text.strip()}
+        {"role": "user", "content": diary_text}
     ]
 
-    return call_chat_api(messages=messages, mode=mode).strip()
+    return call_chat_api(messages=messages, max_tokens=None, mode=mode).strip()
