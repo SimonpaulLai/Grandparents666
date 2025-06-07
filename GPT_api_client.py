@@ -1,10 +1,10 @@
 import os
 import requests
 from dotenv import load_dotenv
+import streamlit as st
 
 # 載入 .env 檔案中的環境變數
-load_dotenv()
-api_key = os.getenv("OPENAI_API_KEY")
+api_key = st.secrets["OPENAI_API_KEY"]
 if api_key is None:
     raise ValueError("請先設定環境變數 OPENAI_API_KEY")
 
