@@ -1,7 +1,6 @@
 from GPT_api_client import call_chat_api
 
-# === 各種資料（可以考慮分成 config.py） ===
-
+# 長輩資料
 resident_profile = {
     "name": "阿水伯",
     "gender": "男性",
@@ -16,6 +15,7 @@ resident_profile = {
     }
 }
 
+# 機構資料
 facility_profile = {
     "name": "清福養老院",
     "location": "新北市三峽區",
@@ -28,6 +28,7 @@ facility_profile = {
     "daily_routine_hint": "早上會巡房，中午前後用餐，下午有活動，傍晚可以散步"
 }
 
+# 工作人員
 staff_profiles = [
     {
         "name": "小芳",
@@ -42,6 +43,7 @@ staff_profiles = [
     }
 ]
 
+# 體徵參考
 vitals_reference = {
     "temperature": {
         "normal": "36.5 ± 0.3",
@@ -60,6 +62,7 @@ vitals_reference = {
     }
 }
 
+# 角色人設
 persona = {
     "name": "里長伯",
     "age_range": "50-60",
@@ -69,6 +72,7 @@ persona = {
     "sample_speech": "啊今天天氣不錯誒，你們家阿水伯吼，今仔日看起來精神真好嘿～"
 }
 
+# 天氣詞彙
 weather_descriptions = {
     "晴天": "太陽露臉，整間院內都暖洋洋的誒",
     "陰天": "今仔日天色灰灰的，不過也沒落雨啦",
@@ -77,13 +81,7 @@ weather_descriptions = {
     "炎熱": "吼～熱吱吱誒，大家都躲在陰影底下乘涼"
 }
 
-# === Diary 生成函式 ===
-
-def generate_diary(user_input: str, mode: str = "simple") -> str:
-    """
-    傳入長輩一天的生活描述，回傳生成的日記內容。
-    """
-
+def generate_diary(user_input: str, mode: str = "debug") -> str:
     system_background = f"""
     長輩基本資料如下：
     {resident_profile}
@@ -100,6 +98,7 @@ def generate_diary(user_input: str, mode: str = "simple") -> str:
     - 天氣描述：{weather_descriptions}
     """
 
+    # 對話訊息
     messages = [
         {
             "role": "system",
@@ -113,8 +112,10 @@ def generate_diary(user_input: str, mode: str = "simple") -> str:
         },
         {
             "role": "user",
-            "content": user_input.strip()
+            "content": (
+                "今天下雨，阿水伯血壓198/70，有去參加音樂課，下午心情好像不錯。"
+         )
         }
     ]
+    return call_chat_api(messages=messages, mode='simple').strip()
 
-    return call_chat_api(messages=messages, mode=mode).strip()
