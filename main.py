@@ -1,4 +1,44 @@
+import os
+from dotenv import load_dotenv
 import streamlit as st
+import openai
+
+# ✅ 載入 .env（如果有）
+load_dotenv()
+
+# ✅ 嘗試讀取 Streamlit secrets 和環境變數
+streamlit_key = None
+try:
+    streamlit_key = st.secrets.get("OPENAI_API_KEY")
+except Exception:
+    pass
+
+env_key = os.getenv("OPENAI_API_KEY")
+active_key = streamlit_key or env_key
+
+# ✅ 驗證 API KEY 是否存在
+if not active_key:
+    st.error("❌ 找不到 OPENAI_API_KEY，請確認 .env 或 .streamlit/secrets.toml 已設定。")
+    st.stop()
+
+# ✅ 嘗試呼叫 OpenAI 進行測試連線
+openai.api_key = active_key
+try:
+    openai.ChatCompletion.create(
+        model="gpt-3.5-turbo",
+        messages=[{"role": "user", "content": "ping"}]
+    )
+except openai.error.AuthenticationError:
+    st.error("❌ OpenAI API Key 無效，請確認你的 key 是否正確或已過期。")
+    st.stop()
+except openai.error.RateLimitError:
+    st.warning("⚠️ OpenAI API 配額或速率限制超過，請稍後再試。")
+    st.stop()
+except Exception as e:
+    st.error(f"❌ 發生未知錯誤：{str(e)}")
+    st.stop()
+
+# ✅ 如果 Key 通過驗證，才繼續載入主要模組
 from Gen_Diary import generate_diary
 from Gen_Emoji import generate_stamp
 from Gen_Graph import generate_image_from_diary
