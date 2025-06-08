@@ -22,15 +22,13 @@ async def generate_diary_endpoint(request: Request):
     # 產生圖片 prompt
     image_prompt = generate_image_prompt(user_input, diary_text)
 
-    # 產生圖片 (儲存於 Render 的暫存資料夾)
-    image_path = "/tmp/output.png"
-    generate_image_from_diary(image_prompt, output_path=image_path)
+    # 產生圖片（獲得圖片網址）
+    image_url = generate_image_from_diary(image_prompt)
 
     response_data = {
         "diary": diary_text,
         "stamp": stamp,
-        "image_prompt": image_prompt
-        # 若需要提供圖片下載，可額外實作 URL 提供功能
+        "image_url": image_url
     }
 
     return JSONResponse(response_data)
