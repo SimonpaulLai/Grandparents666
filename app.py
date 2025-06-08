@@ -1,5 +1,6 @@
 from fastapi import FastAPI, Request
 from fastapi.responses import JSONResponse
+from fastapi.middleware.cors import CORSMiddleware
 from Gen_Diary import generate_diary
 from Gen_Emoji import generate_stamp
 from Gen_Graph import generate_image_from_diary
