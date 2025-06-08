@@ -28,7 +28,7 @@ async def generate_diary_endpoint(request: Request):
     response_data = {
         "diary": diary_text,
         "stamp": stamp,
-        "image_url": image_url
+        "image_url": image_url,
         "image_base64": image_base64
     }
 
