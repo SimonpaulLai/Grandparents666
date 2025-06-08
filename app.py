@@ -1,30 +1,11 @@
-import streamlit as st
-from Gen_Diary import generate_diary
-from Gen_Emoji import generate_stamp
-from Gen_Graph import generate_image_from_diary
-from Gen_Image_Prompt import generate_image_prompt
-from PIL import Image
+from fastapi import FastAPI, Request
+from fastapi.responses import JSONResponse
 
-st.title("🌿 溫馨日記 App")
+app = FastAPI()
 
-user_input = st.text_area("輸入今天的簡單描述：", "今天下雨，阿水伯血壓198/70，有去參加音樂課，下午心情好像不錯。")
+@app.post("/test")
+async def receive_json(request: Request):
+    data = await request.json()  # 取得 JSON 請求內容
+    print("收到的 JSON 資料：", data)  # 印在後台，方便 debug
 
-if st.button("生成日記與圖片"):
-    with st.spinner("正在生成中，請稍候..."):
-        try:
-            diary_text = generate_diary(user_input)
-            stamp = generate_stamp(diary_text)
-            image_prompt = generate_image_prompt(user_input, diary_text)    
-            image_path = generate_image_from_diary(image_prompt)
-
-            st.subheader("📘 日記內容")
-            st.write(diary_text)
-
-            st.subheader("🧩 代表貼圖")
-            st.write(stamp)
-
-            st.subheader("📷 圖片預覽")
-            image = Image.open(image_path)
-            st.image(image, caption="今日圖片")
-        except Exception as e:
-            st.error(f"⚠️ 發生錯誤：{e}")
+    return JSONResponse(content={"status": "received", "data": data})
