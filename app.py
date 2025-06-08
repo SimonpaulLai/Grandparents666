@@ -1,13 +1,13 @@
 from fastapi import FastAPI, Request
 from fastapi.responses import JSONResponse
-#from fastapi.middleware.cors import CORSMiddleware
+from fastapi.middleware.cors import CORSMiddleware
 from Gen_Diary import generate_diary
 from Gen_Emoji import generate_stamp
 from Gen_Graph import generate_image_from_diary
 from Gen_Image_Prompt import generate_image_prompt
 
 app = FastAPI()
-'''
+
 # 設定允許的來源
 app.add_middleware(
     CORSMiddleware,
@@ -16,7 +16,7 @@ app.add_middleware(
     allow_methods=["*"],
     allow_headers=["*"],
 )
-'''
+
 @app.post("/generate_diary")
 async def generate_diary_endpoint(request: Request):
     data = await request.json()
