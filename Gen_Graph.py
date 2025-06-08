@@ -19,11 +19,16 @@ def generate_image_from_diary(diary_text: str, output_path: str = "/tmp/output.p
         input={"prompt": prompt}
     )
 
-    print("🔍 Replicate 回傳內容：", output)
+    # 取得第一個圖片 stream（FileOutput）
+    file_like = output[0]
 
-    if isinstance(output, list):
-        for item in output:
-            if isinstance(item, str) and item.startswith("http"):
-                return item
+    # 讀取二進位圖片資料
+    image_bytes = file_like.read()
 
-    raise ValueError("無法取得圖片網址（replicate 回傳格式不符）")
+    # 編碼成 base64 字串
+    image_base64 = base64.b64encode(image_bytes).decode("utf-8")
+
+    # 加上標頭，讓前端可以直接顯示
+    data_url = f"data:image/png;base64,{image_base64}"
+
+    return data_url
