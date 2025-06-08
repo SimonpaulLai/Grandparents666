@@ -19,7 +19,8 @@ def generate_image_from_diary(diary_text: str, output_path: str = "/tmp/output.p
         input={"prompt": prompt}
     )
 
-    with open(output_path, "wb") as f:
-        f.write(output[0].read())
+    # 假設 output 是 list of image URLs
+    if isinstance(output, list) and isinstance(output[0], str):
+        return output[0]
 
-    return output_path
+    raise ValueError("無法取得圖片網址")
