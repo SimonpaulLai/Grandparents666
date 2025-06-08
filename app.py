@@ -7,6 +7,15 @@ from Gen_Image_Prompt import generate_image_prompt
 
 app = FastAPI()
 
+# 設定允許的來源
+app.add_middleware(
+    CORSMiddleware,
+    allow_origins=["*"],  # 或改成 ["https://yourusername.github.io"] 比較安全
+    allow_credentials=True,
+    allow_methods=["*"],
+    allow_headers=["*"],
+)
+
 @app.post("/generate_diary")
 async def generate_diary_endpoint(request: Request):
     data = await request.json()
