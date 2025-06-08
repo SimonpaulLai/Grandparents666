@@ -1,6 +1,7 @@
 import os
 import replicate
 from GPT_api_client import call_chat_api
+import base64
 
 api_key = os.getenv("REPLICATE_API_KEY")
 if api_key is None:
