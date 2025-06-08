@@ -29,7 +29,7 @@ def call_chat_api(messages, max_tokens=None, mode="simple"):
     }
 
     data = {
-        "model": "gpt-3.5turbo",
+        "model": "gpt-4o-mini",
         "store": False,
         "temperature": 1.0,
         "messages": messages
