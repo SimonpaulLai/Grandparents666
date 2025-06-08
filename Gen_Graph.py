@@ -19,8 +19,11 @@ def generate_image_from_diary(diary_text: str, output_path: str = "/tmp/output.p
         input={"prompt": prompt}
     )
 
-    # 假設 output 是 list of image URLs
-    if isinstance(output, list) and isinstance(output[0], str):
-        return output[0]
+    print("🔍 Replicate 回傳內容：", output)
 
-    raise ValueError("無法取得圖片網址")
+    if isinstance(output, list):
+        for item in output:
+            if isinstance(item, str) and item.startswith("http"):
+                return item
+
+    raise ValueError("無法取得圖片網址（replicate 回傳格式不符）")
