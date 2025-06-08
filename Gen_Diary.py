@@ -113,7 +113,7 @@ def generate_diary(user_input: str, mode: str = "debug") -> str:
         {
             "role": "user",
             "content": (
-                f'{user_input}'
+                f"{user_input}"
          )
         }
     ]
