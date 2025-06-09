@@ -24,7 +24,7 @@ async def generate_diary_endpoint(request: Request):
     user_input = data.get('user_input', '')
 
     # 產生日記內容
-    diary_text = generate_diary(user_input+'若無提及，今天預設是6/8，天氣晴')
+    diary_text = generate_diary(user_input+'若無提及，今天預設是6/9，天氣晴')
 
     # 產生貼圖
     stamp = generate_stamp(diary_text)
